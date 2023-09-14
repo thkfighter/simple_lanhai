@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.0)
 
 #设置生成的VS项目文件结构和本地文件目录一样
 function(assign_source_group)
