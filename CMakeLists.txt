@@ -22,10 +22,10 @@ function(my_add_executable)
 endfunction(my_add_executable)
 
 #工程名称
-project(bluesea)
+project(simple_lanhai VERSION 1.0.0)
 #C++98  C99
-set(CMAKE_CXX_STANDARD 98)
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED True)
 IF (UNIX)
 # 添加对gdb的支持
@@ -46,6 +46,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/sdk")
 include_directories ("${PROJECT_SOURCE_DIR}/sdk/service")
 include_directories ("${PROJECT_SOURCE_DIR}/sdk/third_party/cJson")
 include_directories ("${PROJECT_SOURCE_DIR}/sdk/third_party/mongoose")
+include_directories (${PROJECT_SOURCE_DIR}/include)
 #加载指定目录下的指定格式文件集
 file(GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/sdk/*.cpp  ${PROJECT_SOURCE_DIR}/sdk/*.c  ${PROJECT_SOURCE_DIR}/example/main.cpp)
 file(GLOB_RECURSE HEADER_FILES  ${PROJECT_SOURCE_DIR}/sdk/*.h  ${PROJECT_SOURCE_DIR}/sdk/*.hpp)
@@ -58,11 +59,13 @@ IF (UNIX)
   #list(REMOVE_ITEM SOURCE_FILES ${REMOVE_SOURCES})
   #list(REMOVE_ITEM HEADER_FILES ${REMOVE_HEADERS})
   
+  find_package(Poco REQUIRED COMPONENTS Foundation Net JSON)
+
   source_group("Include" FILES ${HEADER_FILES})
-  #编译生成可执行文件demo
-  my_add_executable(demo ${SOURCE_FILES} ${HEADER_FILES})
+  #编译生成可执行文件${PROJECT_NAME}
+  my_add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
   #添加链接库pthread
-  target_link_libraries(demo m pthread )
+  target_link_libraries(${PROJECT_NAME} m pthread ${Poco_LIBRARIES})
 ELSEIF (WIN32)
   #同上
   file(GLOB_RECURSE REMOVE_SOURCES  "${PROJECT_SOURCE_DIR}/sdk/uart.c")
@@ -72,8 +75,8 @@ ELSEIF (WIN32)
   #list(REMOVE_ITEM HEADER_FILES ${REMOVE_HEADERS})
   
   source_group("Include" FILES ${HEADER_FILES})
-  my_add_executable(demo ${SOURCE_FILES} ${HEADER_FILES})
+  my_add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 ENDIF ()
 
 #make install   将可执行文件放到指定位置
-#install(TARGETS demo RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/tools/)
+#install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/tools/)

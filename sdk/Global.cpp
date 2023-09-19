@@ -1259,7 +1259,8 @@ int SystemAPI::GetComList(std::vector<UARTARG>& list)
 		for (unsigned int j = 0; j < port_list.size(); j++)
 		{
 			int com_speed = port_list.at(j);
-			if (int ret = GetDevInfoByVPC(portNames.at(i).c_str(), com_speed))
+			// if (int ret = GetDevInfoByVPC(portNames.at(i).c_str(), com_speed))
+			if (GetDevInfoByVPC(portNames.at(i).c_str(), com_speed))
 			{
 				com_speed = -1;
 				strcpy(arg.portName, portNames.at(i).c_str());

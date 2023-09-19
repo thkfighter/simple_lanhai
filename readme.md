@@ -1,9 +1,9 @@
-# USB-LIDAR DESCRIPTION#
+# USB-LIDAR DESCRIPTION
 windows/linux SDK and Demo programs for lanhai 2d lidar
 
 #HOW TO BUILD AND USE#
 
-## LINUX ##
+## LINUX
 Prerequisite: g++ and gcc must be installed
 
 	cmake CMakeList.txt
