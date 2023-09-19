@@ -334,8 +334,8 @@ int main(int argc, char **argv)
 		// printf("tfx:%d post:%d num:%d\n",ret,ret2,ret3);
 	}
 
-	simple_datagram.angleStart = 0.0f;
-	simple_datagram.angleEnd = static_cast<float>(2 * M_PI);
+	simple_datagram.angleStart = static_cast<float>(-M_PI);
+	simple_datagram.angleEnd = static_cast<float>(M_PI);
 	simple_datagram.minRange = 0.0f;
 	simple_datagram.maxRange = 60.0f;
 	simple_datagram.hasIntensities = true;
