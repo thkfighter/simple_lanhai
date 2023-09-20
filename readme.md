@@ -1,3 +1,13 @@
+# Interface
+| Device | IP | Subnet mask | Gateway |
+| --- | --- | --- | --- |
+| LiDAR | 192.168.158.98 | 255.255.255.0 | 192.168.158.1 |
+| Computer | 192.168.158.15 | 255.255.255.0 | 192.168.158.1 |
+
+LDS-E400-E
+
+revolution speed: 600~3000 rpm (minimum interval 300 rpm)
+
 # USB-LIDAR DESCRIPTION
 windows/linux SDK and Demo programs for lanhai 2d lidar
 

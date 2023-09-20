@@ -14,10 +14,10 @@ error_circle:3
 error_scale:0.9
 unit_is_mm:1
 with_confidence:1
-with_smooth:1
+with_smooth:0
 with_deshadow:1
 resample:1
-rpm:1500
+rpm:1800
 direction:1
 alarm_msg:1
 ats:0

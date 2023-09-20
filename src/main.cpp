@@ -124,7 +124,7 @@ void CallBackMsg(int msgtype, void *param, int length)
 
 			// std::cout << "FRAMEDATA";
 			// printf("frame idx:%d  %s\t%d \t num:%d timestamp:%d.%d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
-			printf("frame idx:%d  %s:%d\t numBeams:%d timestamp:%d.%06d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
+			printf("frame idx:%d  %s:%d  numBeams:%d  timestamp:%d.%06d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
 
 			for (int i = 0; i < pointdata->data.framedata.N; i++)
 			{
