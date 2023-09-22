@@ -5,7 +5,7 @@ sudo mv linuxdeploy-x86_64.AppImage /usr/bin/
 
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(nproc)
 make install DESTDIR=AppDir
 linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage

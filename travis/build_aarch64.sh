@@ -4,7 +4,7 @@ pip install appimage-builder
 
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(nproc)
 make install DESTDIR=AppDir
 # https://appimage-builder.readthedocs.io/en/latest/intro/tutorial.html
