@@ -19,7 +19,7 @@ void LidarWebService::run(int lidarID)
 	char address[64] = {0};
 	sprintf(address, "http://0.0.0.0:%d", m_port);
 	struct mg_mgr mgr; // Event manager
-	mg_log_set("2");   // Set to 3 to enable debug
+	mg_log_set(2);   // Set to 3 to enable debug
 	mg_mgr_init(&mgr); // Initialise event manager
 
 	mg_http_listen(&mgr, address, thread_web, &lidarID); // Create HTTP listener
@@ -236,10 +236,10 @@ static void thread_web(struct mg_connection *c, int ev, void *ev_data, void *fn_
 				item = cJSON_CreateString(t->is_listening ? "LISTENING" : t->is_accepted ? "ACCEPTED "
 																						 : "CONNECTED");
 				cJSON_AddItemToObject(user, "state", item);
-				mg_straddr(&t->loc, loc, sizeof(loc));
+				// mg_straddr(&t->loc, loc, sizeof(loc));
 				item = cJSON_CreateString(loc);
 				cJSON_AddItemToObject(user, "loc", item);
-				mg_straddr(&t->rem, rem, sizeof(rem));
+				// mg_straddr(&t->rem, rem, sizeof(rem));
 				item = cJSON_CreateString(rem);
 				cJSON_AddItemToObject(user, "rem", item);
 				cJSON_AddItemToArray(points, user);

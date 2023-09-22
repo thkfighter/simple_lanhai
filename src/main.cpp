@@ -10,12 +10,12 @@
  * 2. Reference data.h,udp_linux.h header file
  */
 
-#include <stdio.h>
-#include <string.h>
-#include "../sdk/standard_interface.h"
-#include <Poco/BinaryWriter.h>
+#include "standard_interface.h"
 #include "simple/BinaryInterfaceServer.h"
 #include "simple/LaserMessage.h"
+#include <Poco/BinaryWriter.h>
+#include <stdio.h>
+#include <string.h>
 
 bool debug_{false};
 LaserMessage simple_datagram;
