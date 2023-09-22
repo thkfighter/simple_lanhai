@@ -1,6 +1,7 @@
-﻿#pragma once
-#include<iostream>
+﻿#ifndef LIDARWEBSERVICE_H
+#define LIDARWEBSERVICE_H
 #include"data.h"
+#include<iostream>
 extern "C"
 {
 	#include"third_party/cJson/cJSON.h"
@@ -24,3 +25,4 @@ static char* jsonValue(const char* result, const char* message, cJSON* array);
 static void EEpromV101ToStr(EEpromV101* eepromv101, char* version, char* result);
 static void StringReplace(std::string& strBase, std::string strSrc, std::string strDes);
 static void DevDataToStr(DevData* devdata, int index, char* value);
+#endif //LIDARWEBSERVICE_H

@@ -1,5 +1,5 @@
-﻿#include "LidarCheckService.h"
-#include "LidarWebService.h"
+﻿#include "LidarWebService.h"
+#include "LidarCheckService.h"
 #include "standard_interface.h"
 static const char *s_debug_level = "2";
 static const char *s_root_dir = "web";
