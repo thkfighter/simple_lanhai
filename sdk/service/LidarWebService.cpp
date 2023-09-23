@@ -1,10 +1,17 @@
 ﻿#include "LidarWebService.h"
 #include "LidarCheckService.h"
 #include "standard_interface.h"
-static const char *s_debug_level = "2";
+// static const char *s_debug_level = "2";
 static const char *s_root_dir = "web";
-static const char *s_enable_hexdump = "no";
-static const char *s_ssi_pattern = "*";
+// static const char *s_enable_hexdump = "no";
+// static const char *s_ssi_pattern = "*";
+
+static void thread_web(struct mg_connection* c, int ev, void* ev_data, void* fn_data);
+static char* jsonValue(const char* result, const char* message, cJSON* array);
+static void EEpromV101ToStr(EEpromV101* eepromv101, char* version, char* result);
+static void StringReplace(std::string& strBase, std::string strSrc, std::string strDes);
+static void DevDataToStr(DevData* devdata, int index, char* value);
+
 LidarWebService::LidarWebService(int port)
 {
 	m_port = port;
@@ -275,7 +282,7 @@ static void thread_web(struct mg_connection *c, int ev, void *ev_data, void *fn_
 		// 雷达的动作控制
 		else if (mg_http_match_uri(hm, "/action"))
 		{
-			cJSON *arr = cJSON_CreateArray();
+			// cJSON *arr = cJSON_CreateArray();
 			char query[256] = {0};
 			memcpy(query, hm->query.ptr, hm->query.len);
 			char *ret = strstr(query, "cmd=");
@@ -531,7 +538,7 @@ static void thread_web(struct mg_connection *c, int ev, void *ev_data, void *fn_
 		{
 			mg_http_serve_opts opts = {0};
 			opts.root_dir = s_root_dir;
-			struct mg_http_message tmp = {0};
+			// struct mg_http_message tmp = {0};
 			mg_http_serve_dir(c, hm, &opts);
 		}
 	}

@@ -1,7 +1,7 @@
 ﻿#ifndef __LIDARDATAPROCESS_H__
 #define  __LIDARDATAPROCESS_H__
 #include"Global.h"
-#include"service/LidarWebService.h"
+#include"LidarWebService.h"
 
 #ifdef _WIN32
 
