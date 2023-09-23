@@ -1,3 +1,8 @@
+# Notes
+End of line sequence in the .desktop file must be LF, otherwise an error will be thrown.
+> RROR: Could not find suitable icon for Icon entry
+
+
 # Interface
 | Device | IP | Subnet mask | Gateway |
 | --- | --- | --- | --- |

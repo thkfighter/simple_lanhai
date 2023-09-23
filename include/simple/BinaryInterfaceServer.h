@@ -7,7 +7,7 @@
 #ifndef BINARYINTERFACESERVER_H
 #define BINARYINTERFACESERVER_H 
 
-#include "spdlog/spdlog.h"
+// #include "spdlog/spdlog.h"
 /*
  * C++ Standard lib
  */
@@ -75,8 +75,8 @@ public:
 
                 close(*delIt);
                 clientHandles.erase(delIt);
-                // std::cout << "Client removed!" << std::endl;
-                spdlog::info("Client removed!");
+                std::cout << "Client removed!" << std::endl;
+                // spdlog::info("Client removed!");
             }
             else
             {
@@ -119,8 +119,8 @@ private:
             if (newHandle > 0)
             {
                 std::lock_guard<std::mutex> guard(listenThreadMutex);
-                // std::cout << "New client accepted!" << std::endl;
-                spdlog::info("New client accepted!");
+                std::cout << "New client accepted!" << std::endl;
+                // spdlog::info("New client accepted!");
                 clientHandles.push_back(newHandle);
             }
         }
@@ -186,8 +186,8 @@ private:
                       + std::to_string(Error) + ": " + std::string(strerror(Error)));
         }
 
-        // std::cout << "BinareInterfaceServer:: successfully bound port " << Port << std::endl;
-        spdlog::info("BinareInterfaceServer:: successfully bound port {}", Port);
+        std::cout << "BinareInterfaceServer:: successfully bound port " << Port << std::endl;
+        // spdlog::info("BinareInterfaceServer:: successfully bound port {}", Port);
 
         //listen socket
         rc = ::listen(bindHandle, 100);
