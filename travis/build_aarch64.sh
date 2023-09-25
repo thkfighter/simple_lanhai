@@ -11,3 +11,4 @@ make install DESTDIR=AppDir
 appimage-builder --generate
 appimage-builder --recipe AppImageBuilder.yml
 # Error: packaging.version.InvalidVersion: Invalid version: '1.21.1ubuntu2.1'
+# pip install packaging==21.3
