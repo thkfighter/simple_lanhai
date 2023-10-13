@@ -44,7 +44,11 @@ Generate a solution
 
 #  Related address links #
 
-[downland ros drive](https://github.com/BlueSeaLidar/sdk2)
+ROS drive
+
+https://github.com/BlueSeaLidar/bluesea2
+
+https://github.com/BlueSeaLidar/bluesea-ros2
 
 
 
