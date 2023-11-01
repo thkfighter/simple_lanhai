@@ -2,6 +2,7 @@ bin
 build
 CMakeFiles
 venv
+.vscode/
 
 # Prerequisites
 *.d
