@@ -13,6 +13,7 @@ Download the LiDAR's configuration file, LDS-E400-E.txt, from this repository's 
 | Item | Description |
 | --- | --- |
 | rpm: 1800 | revolution speed: 600~3000 rpm, minimum interval 300 rpm, you can set 600, 900, 1200... |
+| direction: 1 | -1/0/1  inexecution/clockwise/counter-clockwise, valid for some models 不执行/顺时针/逆时针，仅部分雷达生效 | 
 
 ## Use AppImage
 
