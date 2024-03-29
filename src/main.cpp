@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-bool debug_{false};
+std::string log_level{"info"};
+int laser_datagram_port{2112};
 LaserMessage simple_datagram;
 BinaryInterfaceServer *server;
 
@@ -117,8 +118,8 @@ void CallBackMsg(int msgtype, void *param, int length)
 			simple_datagram.duration_beam = simple_datagram.duration_scan / simple_datagram.numBeams;
 
 			// std::cout << "FRAMEDATA";
-			// printf("frame idx:%d  %s\t%d \t num:%d timestamp:%d.%d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
-			printf("frame idx:%d  %s:%d  numBeams:%d  timestamp:%d.%06d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
+			// printf("frame idx:%d  %s:%d  numBeams:%d  timestamp:%d.%06d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
+			spdlog::debug("frame idx:{}  {}:{}  numBeams:{}  timestamp:{:d}.{:06d}\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
 
 			for (int i = 0; i < pointdata->data.framedata.N; i++)
 			{
@@ -228,7 +229,8 @@ void CallBackMsg(int msgtype, void *param, int length)
 	case 4:
 	{
 		DevTimestamp *devtimestamp = (DevTimestamp *)param;
-		printf("DevTimestamp: lidar_ip:%s lidar_port:%d time:%d delay:%d\n", devtimestamp->ip, devtimestamp->port, devtimestamp->timestamp, devtimestamp->delay);
+		// printf("DevTimestamp: LiDAR %s:%d  time %d  delay %d\n", devtimestamp->ip, devtimestamp->port, devtimestamp->timestamp, devtimestamp->delay);
+		spdlog::debug("DevTimestamp: LiDAR {}:{}  time {}  delay {}", devtimestamp->ip, devtimestamp->port, devtimestamp->timestamp, devtimestamp->delay);
 		break;
 	}
 	// 打印信息(也可以作为日志写入)
@@ -249,19 +251,65 @@ void CallBackMsg(int msgtype, void *param, int length)
 	}
 	fflush(stdout);
 }
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-	if (argc < 2)
+	if (argc < 4)
 	{
-		printf("Incorrect number of parameters  %d\n usage : ./demo  ../../config/xxx.txt   At least one txt of Lidar\n", argc);
+		printf("Incorrect number of parameters: %d\n", argc);
+		std::cout << "Usage: " << argv[0] << " <log_level> <laser_datagram_port> <path/to/config/__.txt>\n"
+				  << "\tlaser_datagram_port: 0-65535\n"
+				  << "\tlog_level: trace, debug, info, warn, err, critical and off\n"
+				  << "Example: ./bin/simple_lanhai 2112 info config/LDS-E400-E.txt \n"
+				  << std::endl;
 		return ARG_ERROR_NUM;
 	}
-	server = new BinaryInterfaceServer(4242);
-	BlueSeaLidarSDK *lidarSDK = BlueSeaLidarSDK::getInstance();
-	int lidar_sum = argc - 1;
-	for (int i = 0; i < lidar_sum; i++)
+
+	try
 	{
-		const char *cfg_file_name = argv[i + 1];
+		laser_datagram_port = std::stoi(argv[1]);
+		// Now laser_datagram_port contains the integer value of the second command line argument
+	}
+	catch (const std::invalid_argument &ia)
+	{
+		std::cerr << "Invalid argument: " << argv[2] << ". Not a valid integer." << std::endl;
+		return 1;
+	}
+	catch (const std::out_of_range &oor)
+	{
+		std::cerr << "Out of range: " << argv[2] << ". Integer too large." << std::endl;
+		return 1;
+	}
+
+	log_level = argv[2];
+	// Set global log level
+	std::map<std::string, spdlog::level::level_enum> log_levels = {
+		{"trace", spdlog::level::trace},
+		{"debug", spdlog::level::debug},
+		{"info", spdlog::level::info},
+		{"warn", spdlog::level::warn},
+		{"err", spdlog::level::err},
+		{"critical", spdlog::level::critical},
+		{"off", spdlog::level::off}};
+	auto it = log_levels.find(log_level);
+	if (it != log_levels.end())
+	{
+		spdlog::set_level(it->second);
+	}
+	else
+	{
+		throw std::runtime_error(fmt::format("Invalid log level: {}", log_level));
+	}
+
+	// configure spdlog to display log entries with only the message content and
+	// nothing else (no timestamps, log levels, thread IDs, etc.).
+	spdlog::set_pattern("%v");
+
+	server = new BinaryInterfaceServer(laser_datagram_port);
+	BlueSeaLidarSDK *lidarSDK = BlueSeaLidarSDK::getInstance();
+	// int lidar_sum = argc - 1;
+	// for (int i = 0; i < lidar_sum; i++)
+	{
+		const char *cfg_file_name = argv[3];
 		// 根据配置文件路径添加相关的雷达
 		int lidarID = lidarSDK->addLidarByPath(cfg_file_name);
 		if (!lidarID)
