@@ -13,6 +13,7 @@
 #include "standard_interface.h"
 #include "simple/BinaryInterfaceServer.h"
 #include "simple/LaserMessage.h"
+#include "spdlog/spdlog.h"
 #include <Poco/BinaryWriter.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,28 +52,22 @@ bool serialize_and_send_datagram_poco(LaserMessage &simple_datagram)
 	// writer.writeRaw(simple_datagram.ranges, simple_datagram.ranges.size() * sizeof(float));
 	writer << simple_datagram.rangeArraySize;
 
-	if (debug_)
-		std::cout << "\nRanges:\n";
-	for (const auto range : simple_datagram.ranges)
+	for (const auto &range : simple_datagram.ranges)
 	{
 		writer << (std::isnan(range) ? -1e4f : range);
-		if (debug_)
-			std::cout << range << ", ";
 	}
+	spdlog::debug("Ranges: \n{}", fmt::join(simple_datagram.ranges, ", "));
 
 	writer << static_cast<char>(simple_datagram.hasIntensities);
 	writer << simple_datagram.minIntensity;
 	writer << simple_datagram.maxIntensity;
 	writer << simple_datagram.intensityArraySize;
 
-	if (debug_)
-		std::cout << "\nIntensities:\n";
 	for (const auto intensity : simple_datagram.intensities)
 	{
 		writer << intensity;
-		if (debug_)
-			std::cout << intensity << ", ";
 	}
+	spdlog::debug("Intensities: \n{}", fmt::join(simple_datagram.intensities, ", "));
 
 	writer.flush();
 	if (resulting_msg_size != buffer.size())
@@ -81,7 +76,6 @@ bool serialize_and_send_datagram_poco(LaserMessage &simple_datagram)
 		return false;
 	}
 
-	// server->write(&buffer, sizeof(buffer));
 	server->write(buffer.begin(), buffer.size());
 	// TODO Return a variable by reference
 	return true;
