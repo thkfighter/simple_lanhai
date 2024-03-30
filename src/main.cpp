@@ -11,8 +11,8 @@
  */
 
 #include "standard_interface.h"
-#include "simple/BinaryInterfaceServer.h"
-#include "simple/LaserMessage.h"
+#include "LLSInterfaceCodeExamples/BinaryInterfaceServer.h"
+#include "simple/BinaryInterfaceClientSensorLaser.h"
 #include "spdlog/spdlog.h"
 #include <Poco/BinaryWriter.h>
 #include <stdio.h>
@@ -20,10 +20,10 @@
 
 std::string log_level{"info"};
 int laser_datagram_port{2112};
-LaserMessage simple_datagram;
+ClientSensorLaserDatagram simple_datagram;
 BinaryInterfaceServer *server;
 
-bool serialize_and_send_datagram_poco(LaserMessage &simple_datagram)
+bool serialize_and_send_datagram_poco(ClientSensorLaserDatagram &simple_datagram)
 {
 	const size_t resulting_msg_size = 2											// scanNum
 									  + 5 * 8									// time_start, uniqueId, duration_beam, duration_scan, duration_rotate
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 	}
 	catch (const std::invalid_argument &ia)
 	{
-		std::cerr << "Invalid argument: " << argv[2] << ". Not a valid integer." << std::endl;
+		std::cerr << "Invalid argument: " << argv[2] << ". Not a valid port number." << std::endl;
 		return 1;
 	}
 	catch (const std::out_of_range &oor)
@@ -321,9 +321,11 @@ int main(int argc, char *argv[])
 		// 读取雷达的全局参数
 		EEpromV101 eepromv101;
 		if (lidarSDK->GetDevInfo(lidarID, &eepromv101))
+		{
+			simple_datagram.duration_rotate = 60.0 / eepromv101.RPM;
+			simple_datagram.duration_scan = simple_datagram.duration_rotate;
 			CallBackMsg(3, &eepromv101, sizeof(EEpromV101));
-		simple_datagram.duration_rotate = 60.0 / eepromv101.RPM;
-		simple_datagram.duration_scan = simple_datagram.duration_rotate;
+		}
 
 		// 传入数据信息的回调函数
 		lidarSDK->setCallBackPtr(lidarID, CallBackMsg);
@@ -375,14 +377,6 @@ int main(int argc, char *argv[])
 		// ret3=lidarSDK->SetDID(lidarID,999);
 		// printf("tfx:%d post:%d num:%d\n",ret,ret2,ret3);
 	}
-
-	simple_datagram.angleStart = static_cast<float>(-M_PI);
-	simple_datagram.angleEnd = static_cast<float>(M_PI);
-	simple_datagram.minRange = 0.0f;
-	simple_datagram.maxRange = 60.0f;
-	simple_datagram.hasIntensities = true;
-	simple_datagram.minIntensity = 0.0f;
-	simple_datagram.maxIntensity = 100.0f;
 
 	while (1)
 	{
