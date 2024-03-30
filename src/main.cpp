@@ -256,10 +256,10 @@ int main(int argc, char *argv[])
 	if (argc < 4)
 	{
 		printf("Incorrect number of parameters: %d\n", argc);
-		std::cout << "Usage: " << argv[0] << " <log_level> <laser_datagram_port> <path/to/config/__.txt>\n"
-				  << "\tlaser_datagram_port: 0-65535\n"
+		std::cout << "Usage: " << argv[0] << " <laser_datagram_port> <log_level> <path/to/config/__.txt>\n"
+				  << "\tlaser_datagram_port: 0-65535; laser datagrams are sent from this port\n"
 				  << "\tlog_level: trace, debug, info, warn, err, critical and off\n"
-				  << "Example: ./bin/simple_lanhai 2112 info config/LDS-E400-E.txt \n"
+				  << "Example: " << argv[0] << " 2112 info config/LDS-E400-E.txt \n"
 				  << std::endl;
 		return ARG_ERROR_NUM;
 	}
