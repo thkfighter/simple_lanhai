@@ -52,7 +52,42 @@ bool serialize_and_send_datagram_poco(ClientSensorLaserDatagram &simple_datagram
 
 	// writer.writeRaw(simple_datagram.ranges, simple_datagram.ranges.size() * sizeof(float));
 	writer << simple_datagram.rangeArraySize;
-
+	spdlog::debug(R"(
+numBeams: {}
+time_start: {}
+uniqueId: {}
+duration_beam: {}
+duration_scan: {}
+duration_rotate: {}
+numBeams: {}
+angleStart: {}
+angleEnd: {}
+angleInc: {}
+minRange: {}
+maxRange: {}
+rangeArraySize: {}
+hasIntensities: {}
+minIntensity: {}
+maxIntensity: {}
+intensityArraySize: {}
+)",
+				  simple_datagram.numBeams,
+				  simple_datagram.time_start,
+				  simple_datagram.uniqueId,
+				  simple_datagram.duration_beam,
+				  simple_datagram.duration_scan,
+				  simple_datagram.duration_rotate,
+				  simple_datagram.numBeams,
+				  simple_datagram.angleStart,
+				  simple_datagram.angleEnd,
+				  simple_datagram.angleInc,
+				  simple_datagram.minRange,
+				  simple_datagram.maxRange,
+				  simple_datagram.rangeArraySize,
+				  simple_datagram.hasIntensities,
+				  simple_datagram.minIntensity,
+				  simple_datagram.maxIntensity,
+				  simple_datagram.intensityArraySize);
 	for (const auto &range : simple_datagram.ranges)
 	{
 		writer << (std::isnan(range) ? -1e4f : range);
@@ -119,8 +154,7 @@ void CallBackMsg(int msgtype, void *param, int length)
 
 			// std::cout << "FRAMEDATA";
 			// printf("frame idx:%d  %s:%d  numBeams:%d  timestamp:%d.%06d\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
-			spdlog::debug("frame idx:{}  {}:{}  numBeams:{}  timestamp:{:d}.{:06d}\n", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
-
+			spdlog::debug("\nframe idx:{}  {}:{}  numBeams:{}  timestamp:{:d}.{:06d}", pointdata->idx, pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.N, pointdata->data.framedata.ts[0], pointdata->data.framedata.ts[1]);
 			for (int i = 0; i < pointdata->data.framedata.N; i++)
 			{
 				// printf("%s\t%d \t%.5f\t%.3f\t%d\n", pointdata->connectArg1, pointdata->connectArg2, pointdata->data.framedata.data[i].angle, pointdata->data.framedata.data[i].distance, pointdata->data.framedata.data[i].confidence);
@@ -309,73 +343,78 @@ int main(int argc, char *argv[])
 	// int lidar_sum = argc - 1;
 	// for (int i = 0; i < lidar_sum; i++)
 	{
-		const char *cfg_file_name = argv[3];
-		// 根据配置文件路径添加相关的雷达
-		int lidarID = lidarSDK->addLidarByPath(cfg_file_name);
-		if (!lidarID)
-		{
-			printf("config file %s does not exist\n", cfg_file_name);
-			return -1;
-		}
+	const char *cfg_file_name = argv[3];
+	// 根据配置文件路径添加相关的雷达
+	int lidarID = lidarSDK->addLidarByPath(cfg_file_name);
+	if (!lidarID)
+	{
+		printf("config file %s does not exist\n", cfg_file_name);
+		return -1;
+	}
 
-		// 读取雷达的全局参数
-		EEpromV101 eepromv101;
-		if (lidarSDK->GetDevInfo(lidarID, &eepromv101))
-		{
-			simple_datagram.duration_rotate = 60.0 / eepromv101.RPM;
-			simple_datagram.duration_scan = simple_datagram.duration_rotate;
-			CallBackMsg(3, &eepromv101, sizeof(EEpromV101));
-		}
+	// 读取雷达的全局参数
+	EEpromV101 eepromv101;
+	if (lidarSDK->GetDevInfo(lidarID, &eepromv101))
+	{
+		simple_datagram.duration_rotate = 60.0 / eepromv101.RPM;
+		simple_datagram.duration_scan = simple_datagram.duration_rotate;
+		CallBackMsg(3, &eepromv101, sizeof(EEpromV101));
+	}
+	else
+	{
+		spdlog::error("GetDevInfo() failed");
+		return -1;
+	}
 
-		// 传入数据信息的回调函数
-		lidarSDK->setCallBackPtr(lidarID, CallBackMsg);
+	// 传入数据信息的回调函数
+	lidarSDK->setCallBackPtr(lidarID, CallBackMsg);
 
-		// 连接指定雷达，以及相关的线程池
-		if (!lidarSDK->openDev(lidarID))
-		{
-			printf("open lidar failed:%d\n", lidarID);
-			return -2;
-		}
-		printf("SDK version:%s\n", lidarSDK->getVersion());
-		// sleep(2);
+	// 连接指定雷达，以及相关的线程池
+	if (!lidarSDK->openDev(lidarID))
+	{
+		printf("open lidar failed:%d\n", lidarID);
+		return -2;
+	}
+	printf("SDK version:%s\n", lidarSDK->getVersion());
+	// sleep(2);
 
-		// 切换防区(仅防区款)
-		// char zone = '9';
-		// if (!lidarSDK->ZoneSection(lidarID, zone))
-		//{
-		//	printf("switch the specified zone failed!\n");
-		//}
+	// 切换防区(仅防区款)
+	// char zone = '9';
+	// if (!lidarSDK->ZoneSection(lidarID, zone))
+	//{
+	//	printf("switch the specified zone failed!\n");
+	//}
 
-		// 控制雷达的启动，停止，重新旋转
-		//  lidarSDK->ControlDrv(lidarID,6,"LSTARH");
-		//  sleep(2);
-		//  lidarSDK->ControlDrv(lidarID,6,"LSTOPH");
-		//  sleep(2);
-		//  lidarSDK->ControlDrv(lidarID,6,"LRESTH");
-		//  sleep(3);
+	// 控制雷达的启动，停止，重新旋转
+	//  lidarSDK->ControlDrv(lidarID,6,"LSTARH");
+	//  sleep(2);
+	//  lidarSDK->ControlDrv(lidarID,6,"LSTOPH");
+	//  sleep(2);
+	//  lidarSDK->ControlDrv(lidarID,6,"LRESTH");
+	//  sleep(3);
 
-		// 设置雷达的网络参数(仅限网络款/防区款)(掉电保存)(修改后需要重新调整目标雷达的ip)
-		// lidarSDK->SetUDP(lidarID,"192.168.0.140","255.255.255.0","192.168.0.1",6543);
+	// 设置雷达的网络参数(仅限网络款/防区款)(掉电保存)(修改后需要重新调整目标雷达的ip)
+	// lidarSDK->SetUDP(lidarID,"192.168.0.140","255.255.255.0","192.168.0.1",6543);
 
-		// 设置雷达的上传网络参数地址(仅限网络款/防区款)(掉电保存)
-		// lidarSDK->SetDST(lidarID,"192.168.0.49",6543);
+	// 设置雷达的上传网络参数地址(仅限网络款/防区款)(掉电保存)
+	// lidarSDK->SetDST(lidarID,"192.168.0.49",6543);
 
-		// bool ret,ret2,ret3;
-		////转速修改(掉电不保存)
-		// ret=lidarSDK->SetRPM(lidarID,3000);
-		////滤波(掉电不保存)
-		// ret2=lidarSDK->SetDSW(lidarID,true);
-		////去拖点(掉电不保存)
-		// ret3=lidarSDK->SetSMT(lidarID,true);
-		// printf("rpm:%d fitter:%d  smooth:%d\n",ret,ret2,ret3);
+	// bool ret,ret2,ret3;
+	////转速修改(掉电不保存)
+	// ret=lidarSDK->SetRPM(lidarID,3000);
+	////滤波(掉电不保存)
+	// ret2=lidarSDK->SetDSW(lidarID,true);
+	////去拖点(掉电不保存)
+	// ret3=lidarSDK->SetSMT(lidarID,true);
+	// printf("rpm:%d fitter:%d  smooth:%d\n",ret,ret2,ret3);
 
-		// ////固定上传(仅限网络款/防区款)(掉电保存)
-		// ret = lidarSDK->SetTFX(lidarID,false);
-		// //数据上传类型(仅限网络款/防区款)(掉电保存)
-		// ret2=lidarSDK->SetPST(lidarID,3);
-		// //设置雷达编号(仅限网络款/防区款)(掉电保存)
-		// ret3=lidarSDK->SetDID(lidarID,999);
-		// printf("tfx:%d post:%d num:%d\n",ret,ret2,ret3);
+	// ////固定上传(仅限网络款/防区款)(掉电保存)
+	// ret = lidarSDK->SetTFX(lidarID,false);
+	// //数据上传类型(仅限网络款/防区款)(掉电保存)
+	// ret2=lidarSDK->SetPST(lidarID,3);
+	// //设置雷达编号(仅限网络款/防区款)(掉电保存)
+	// ret3=lidarSDK->SetDID(lidarID,999);
+	// printf("tfx:%d post:%d num:%d\n",ret,ret2,ret3);
 	}
 
 	while (1)
